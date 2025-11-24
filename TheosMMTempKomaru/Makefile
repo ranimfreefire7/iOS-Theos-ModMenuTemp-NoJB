@@ -14,7 +14,7 @@ FOR_RELEASE = 1
 
 include $(THEOS)/makefiles/common.mk
 
-TWEAK_NAME = KTemp
+TWEAK_NAME = Ranim
 
 $(TWEAK_NAME)_FRAMEWORKS = UIKit Foundation Security QuartzCore CoreGraphics CoreText  AVFoundation Accelerate GLKit SystemConfiguration GameController
 
