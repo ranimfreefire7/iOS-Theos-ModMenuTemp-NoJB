@@ -1,5 +1,5 @@
 #import <Foundation/Foundation.h>
-#import "../Imgui/imgui.h"
+#import "../imGui/imgui.h"
 #import <mach-o/dyld.h>
 #import <dlfcn.h>
 
