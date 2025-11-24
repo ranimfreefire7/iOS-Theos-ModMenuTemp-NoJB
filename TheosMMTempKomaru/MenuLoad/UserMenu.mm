@@ -1,66 +1,101 @@
-/*
-IOS Theos Template Komaru
-Jailed (NoJB) Mod Menu Template for iOS Games
-By aq9
-https://github.com/VenerableCode/iOS-Theos-ModMenuTemp-NoJB
-*/
+#import <Foundation/Foundation.h>
+#import "imgui/imgui.h"
+#import <mach-o/dyld.h>
+#import <dlfcn.h>
 
+// --- متغيرات القائمة (Menu Variables) ---
+bool showMenu = true; // اجعليها true لتظهر القائمة عند التشغيل
+bool isVerified = false;
+char keyInput[64] = ""; 
 
-#include "UserMenu.h"
-#include "Includes.h"
+// خيارات القائمة الوهمية
+bool aimfov = false;
+bool aimsilent = false;
+bool espbox = false;
+bool esplines = false;
+bool ninjarun = false;
+bool speedhack = false;
 
-void UserMenu::DrawMenu()
-{
-
-
-    //ImVec2 menuPos = ImGui::GetWindowPos();
-	//ImVec2 windowsize = ImGui::GetWindowSize();
-
-    ImVec2 WindowSize = ImVec2(275, 200);
-    ImGui::SetNextWindowSize(WindowSize, ImGuiCond_Once);
-
-    ImVec2 WindowPosition = ImVec2((SCREEN_WIDTH - WindowSize.x) / 2, (SCREEN_HEIGHT - WindowSize.y) / 2);
-    ImGui::SetNextWindowPos(WindowPosition, ImGuiCond_Once);
-
-    ImGuiWindowFlags WindowFlags = KTempVars.MoveMenu ? ImGuiWindowFlags_NoCollapse : ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
-
-    if (ImGui::Begin("KomaruTemp", NULL, WindowFlags))
-    {
-        ImGuiWindow* CurrentWindow = ImGui::GetCurrentWindow();
-        KTempVars.MenuSize   = CurrentWindow->Size;
-        KTempVars.MenuOrigin = CurrentWindow->Pos;
-
-        ImGui::SliderFloat("FOV Changer", &KTempVars.CameraFOV, 60.0f, 160.0f);
-
-        //misc menu options
-        ImGui::Checkbox("Move Menu", &KTempVars.MoveMenu);
-        ImGui::SameLine();
-        ImGui::Checkbox("Streamer Mode", &KTempVars.StreamerMode);
-
-        ImGui::End();
+// --- دالة الحماية (Anti-Steal) ---
+bool CheckIntegrity() {
+    Dl_info info;
+    if (dladdr((const void*)CheckIntegrity, &info)) {
+        NSString *path = [NSString stringWithUTF8String:info.dli_fname];
+        // يجب أن يكون الاسم Ranim
+        if (![path containsString:@"Ranim"]) {
+            return false; 
+        }
     }
+    return true;
 }
 
+// --- تصميم رنيم الوردي (Theme) ---
+void SetupStyle() {
+    ImGuiStyle& style = ImGui::GetStyle();
+    style.WindowRounding = 12.0f;
+    style.FrameRounding = 6.0f;
+    
+    ImVec4 pink = ImVec4(1.00f, 0.40f, 0.70f, 1.00f); 
+    ImVec4 darkPink = ImVec4(0.80f, 0.20f, 0.50f, 0.90f); 
+    ImVec4 blurBG = ImVec4(0.10f, 0.05f, 0.10f, 0.85f); 
 
-void UserMenu::RenderingMenu()
-{
-    ImGui::Begin("RenderMenu", nullptr,
-        ImGuiWindowFlags_NoTitleBar |
-        ImGuiWindowFlags_NoResize |
-        ImGuiWindowFlags_NoMove |
-        ImGuiWindowFlags_NoBackground |
-        ImGuiWindowFlags_NoInputs);
+    style.Colors[ImGuiCol_WindowBg] = blurBG;
+    style.Colors[ImGuiCol_TitleBg] = darkPink;
+    style.Colors[ImGuiCol_TitleBgActive] = pink;
+    style.Colors[ImGuiCol_CheckMark] = pink;
+    style.Colors[ImGuiCol_Text] = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
+}
 
-    ImDrawList* drawList = ImGui::GetBackgroundDrawList();
+// --- رسم القائمة (Draw Function) ---
+// ملاحظة: في هذا القالب، عادة يتم استدعاء هذه الدالة من الخارج
+void DrawMenu() {
+    // 1. فخ الحماية
+    if (!CheckIntegrity()) {
+        ImGui::Begin("SECURITY ALERT 🚫", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize);
+        ImGui::TextColored(ImVec4(1, 0, 0, 1), "Wlhla sre9tih wa tir b zekek"); 
+        ImGui::Text("File name must be: Ranim.dylib");
+        ImGui::End();
+        return;
+    }
 
-    // Render drawings here
+    SetupStyle(); 
 
+    ImGui::Begin("Ranim Cheats 🌸", &showMenu);
+
+    // 2. نظام المفتاح
+    if (!isVerified) {
+        ImGui::Text("Bghiti tkhdem bih chri key 🔑");
+        ImGui::InputText("Key", keyInput, 64);
+        if (ImGui::Button("Activate")) {
+            if (strcmp(keyInput, "Ranim") == 0) {
+                isVerified = true;
+            }
+        }
+        ImGui::End();
+        return;
+    }
+
+    // 3. القائمة الرئيسية
+    ImGui::Text("Welcome Ranim ✨");
+    ImGui::Separator();
+
+    if (ImGui::CollapsingHeader("AIMBOT")) {
+        ImGui::Checkbox("Aimfov 360", &aimfov);
+        if (aimfov) ImGui::TextColored(ImVec4(1, 0, 1, 1), "  [Active 🔥]");
+        ImGui::Checkbox("Aims Silent", &aimsilent);
+    }
+
+    if (ImGui::CollapsingHeader("ESP")) {
+        ImGui::Checkbox("Esp Box", &espbox);
+        ImGui::Checkbox("Esp Lines", &esplines);
+    }
+    
+    if (ImGui::CollapsingHeader("MISC")) {
+         ImGui::Checkbox("Ninja Run", &ninjarun);
+         ImGui::Checkbox("Speed", &speedhack);
+    }
+
+    ImGui::Separator();
+    ImGui::Text("Protected by Ranim 🛡️");
     ImGui::End();
-}
-
-
-void UserMenu::Initialize()
-{
-    DrawMenu();
-    RenderingMenu();
 }
